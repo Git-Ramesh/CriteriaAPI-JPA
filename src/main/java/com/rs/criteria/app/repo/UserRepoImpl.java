@@ -10,6 +10,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import org.hibernate.query.criteria.internal.OrderImpl;
+import org.springframework.data.geo.Circle;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,11 +58,9 @@ public class UserRepoImpl implements UserRepoAdditional {
 		CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
 		CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
 		Root<User> from = criteriaQuery.from(User.class);
-		CriteriaQuery<User> orderBy = criteriaQuery.select(from)
-				.orderBy(new OrderImpl(from.get(attributeName), ascending));
-		CriteriaQuery<User> multiselect = criteriaQuery
-				.multiselect(criteriaBuilder.like(from.<String>get("username", "%"+filter+"%")));
-		TypedQuery<User> typedQuery = this.entityManager.createQuery(multiselect);
+		CriteriaQuery<User> criteriaQuery2 = criteriaQuery.select(from).where(criteriaBuilder.like(from.get("username"), "%"+filter+"%"));
+		CriteriaQuery<User> criteriaQuery3 = criteriaQuery2.orderBy(new OrderImpl(from.get("age"), ascending));
+		TypedQuery<User> typedQuery = this.entityManager.createQuery(criteriaQuery3);
 		return typedQuery.getResultList();
 	}
 }
